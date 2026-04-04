@@ -1,3 +1,4 @@
+import time
 import anthropic
 import json
 from tools import execute_tool
@@ -54,6 +55,7 @@ def run_agent(user_query: str, progress_callback=None) -> str:
                     if progress_callback:
                         progress_callback(f"🔍 搜尋關鍵字：{block.input.get('keyword', '')}")
                     result = execute_tool(block.name, block.input)
+                    time.sleep(1) 
                     tool_results.append({
                         "type": "tool_result",
                         "tool_use_id": block.id,
