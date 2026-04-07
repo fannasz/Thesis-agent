@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from agent import run_agent
 
-st.set_page_config(page_title="論文搜尋 Agent", page_icon="📚")
+st.set_page_config(page_title="論文搜尋 Agent OuO")
 
 os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
