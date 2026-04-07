@@ -3,6 +3,21 @@ import os
 from agent import run_agent
 
 st.set_page_config(page_title="論文搜尋 Agent ouo")
+st.markdown("""
+<style>
+/* 對話輸入框加框線 */
+textarea {
+    border: 2px solid #2563EB !important;
+    border-radius: 8px !important;
+}
+
+/* 聚焦時框線變深 */
+textarea:focus {
+    border: 2px solid #1E3A5F !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
