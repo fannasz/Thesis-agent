@@ -21,7 +21,7 @@ textarea:focus {
 
 os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
-st.title("📖 論文搜尋 Agent")
+st.title("論文搜尋 Agent ouo")
 
 st.markdown("### 搜尋條件")
 col_a, col_b, col_c = st.columns(3)
@@ -76,7 +76,7 @@ if st.button("搜尋", type="primary"):
 
             with col1:
                 st.download_button(
-                    "⬇️ 下載 Markdown",
+                    "下載 Markdown",
                     data=result,
                     file_name="論文搜尋.md",
                     mime="text/markdown"
@@ -94,7 +94,7 @@ if st.button("搜尋", type="primary"):
                 doc.save(buf)
                 buf.seek(0)
                 st.download_button(
-                    "⬇️ 下載 Word",
+                    "下載 Word",
                     data=buf,
                     file_name="論文搜尋.docx",
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
