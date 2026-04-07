@@ -37,7 +37,7 @@ def search_thesis(keyword: str,
                 "year":      item.get("publication_year", ""),
                 "abstract":  (item.get("abstract_inverted_index") and "（有摘要）") or "（無摘要）",
                 "citations": item.get("cited_by_count", 0),
-                "doi":       item.get("doi", "")
+                "doi":       item.get("doi", ""),
                 "keywords":  [k["display_name"] for k in item.get("keywords", [])],
                 "concepts":  [c["display_name"] for c in item.get("concepts", [])[:5]]
             })
