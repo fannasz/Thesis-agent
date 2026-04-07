@@ -22,10 +22,15 @@ if st.button("搜尋", type="primary"):
             status.info(msg)
 
         with st.spinner(""):
-            result = run_agent(query, progress_callback=update)
+    try:
+        result = run_agent(query, progress_callback=update)
+    except Exception as e:
+        result = f"⚠️ 發生錯誤：{str(e)}"
 
-        status.empty()
-st.markdown(result)
+status.empty()
+
+if result:
+    st.markdown(result)
 
 # 產生下載檔案
 col1, col2, col3 = st.columns(3)
