@@ -27,13 +27,13 @@ st.markdown("### 搜尋條件")
 col_a, col_b, col_c = st.columns(3)
 
 with col_a:
-    keyword1 = st.text_input("第一順位（主要主題）",
+    keyword1 = st.text_input("第一順位",
                               placeholder="例如：人工智慧")
 with col_b:
-    keyword2 = st.text_input("第二順位（縮小範圍）",
+    keyword2 = st.text_input("第二順位",
                               placeholder="例如：台灣")
 with col_c:
-    keyword3 = st.text_input("第三順位（進一步篩選）",
+    keyword3 = st.text_input("第三順位",
                               placeholder="例如：社會階層")
 
 if st.button("搜尋", type="primary"):
