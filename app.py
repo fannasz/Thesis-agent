@@ -21,15 +21,41 @@ textarea:focus {
 
 os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
-st.title("論文搜尋 Agent ouo")
+st.title("📖 論文搜尋 Agent")
 
-query = st.text_area("輸入關鍵字", height=100,
-                     placeholder="例如：社會階層、人工智慧態度")
+st.markdown("### 搜尋條件")
+col_a, col_b, col_c = st.columns(3)
+
+with col_a:
+    keyword1 = st.text_input("第一順位（主要主題）",
+                              placeholder="例如：人工智慧")
+with col_b:
+    keyword2 = st.text_input("第二順位（縮小範圍）",
+                              placeholder="例如：台灣")
+with col_c:
+    keyword3 = st.text_input("第三順位（進一步篩選）",
+                              placeholder="例如：社會階層")
 
 if st.button("搜尋", type="primary"):
-    if not query.strip():
-        st.warning("請輸入研究問題")
+    if not keyword1.strip():
+        st.warning("請至少填寫第一順位關鍵字")
     else:
+        # 組合關鍵字，只加入有填寫的欄位
+        keywords = [k for k in [keyword1, keyword2, keyword3] if k.strip()]
+        combined_query = " ".join(keywords)
+
+        # 告訴 Agent 搜尋邏輯
+        query = f"""
+請搜尋以下主題的論文：
+- 第一順位（必須符合）：{keyword1}
+{"- 第二順位（優先符合）：" + keyword2 if keyword2 else ""}
+{"- 第三順位（額外篩選）：" + keyword3 if keyword3 else ""}
+
+搜尋時以第一順位為主要關鍵字，
+回傳的論文必須與第一順位相關，
+有符合第二、第三順位的論文優先排在前面。
+"""
+
         status = st.empty()
 
         def update(msg):
