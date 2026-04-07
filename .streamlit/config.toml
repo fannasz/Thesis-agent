@@ -1,6 +1,6 @@
 [theme]
 primaryColor = "#2563EB"        # 按鈕、強調色
-backgroundColor = "#f0f8ff"     # 主背景
+backgroundColor = "#fffacd"     # 主背景
 secondaryBackgroundColor = "#F0F4FF"  # 側欄背景
 textColor = "#000000"           # 文字顏色
 font = "sans serif"             # 字型
