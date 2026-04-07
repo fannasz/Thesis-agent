@@ -4,7 +4,6 @@ from agent import run_agent
 
 st.set_page_config(page_title="論文搜尋 Agent", page_icon="📚")
 
-# 自動從 Secrets 讀取，不需要使用者輸入
 os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
 st.title("📖 論文搜尋 Agent")
@@ -22,43 +21,40 @@ if st.button("搜尋", type="primary"):
             status.info(msg)
 
         with st.spinner(""):
-    try:
-        result = run_agent(query, progress_callback=update)
-    except Exception as e:
-        result = f"⚠️ 發生錯誤：{str(e)}"
+            try:
+                result = run_agent(query, progress_callback=update)
+            except Exception as e:
+                result = f"⚠️ 發生錯誤：{str(e)}"
 
-status.empty()
+        status.empty()
 
-if result:
-    st.markdown(result)
+        if result:
+            st.markdown(result)
 
-# 產生下載檔案
-col1, col2, col3 = st.columns(3)
+            col1, col2 = st.columns(2)
 
-# Markdown 下載
-with col1:
-    st.download_button(
-        "⬇️ 下載 Markdown",
-        data=result,
-        file_name="論文搜尋.md",
-        mime="text/markdown"
-    )
+            with col1:
+                st.download_button(
+                    "⬇️ 下載 Markdown",
+                    data=result,
+                    file_name="論文搜尋.md",
+                    mime="text/markdown"
+                )
 
-# Word 下載
-with col2:
-    from docx import Document
-    from io import BytesIO
+            with col2:
+                from docx import Document
+                from io import BytesIO
 
-    doc = Document()
-    doc.add_heading("論文搜尋結果", 0)
-    for line in result.split("\n"):
-        doc.add_paragraph(line)
-    buf = BytesIO()
-    doc.save(buf)
-    buf.seek(0)
-    st.download_button(
-        "⬇️ 下載 Word",
-        data=buf,
-        file_name="論文搜尋.docx",
-        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    )
+                doc = Document()
+                doc.add_heading("論文搜尋結果", 0)
+                for line in result.split("\n"):
+                    doc.add_paragraph(line)
+                buf = BytesIO()
+                doc.save(buf)
+                buf.seek(0)
+                st.download_button(
+                    "⬇️ 下載 Word",
+                    data=buf,
+                    file_name="論文搜尋.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
