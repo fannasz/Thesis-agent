@@ -2,11 +2,11 @@ import streamlit as st
 import os
 from agent import run_agent
 
-st.set_page_config(page_title="論文搜尋 Agent OuO")
+st.set_page_config(page_title="論文搜尋 Agent")
 
 os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
-st.title("📖 論文搜尋 Agent")
+st.title("論文搜尋 Agent ouo")
 
 query = st.text_area("輸入關鍵字", height=100,
                      placeholder="例如：社會階層、人工智慧態度")
