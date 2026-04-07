@@ -62,22 +62,3 @@ with col2:
         file_name="論文搜尋.docx",
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
-
-# PDF 下載
-with col3:
-    from fpdf import FPDF
-    from io import BytesIO
-
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.add_font("NotoSans", fname="NotoSansTC-Regular.ttf", uni=True)
-    pdf.set_font("NotoSans", size=12)
-    for line in result.split("\n"):
-        pdf.multi_cell(0, 8, line)
-    pdf_bytes = pdf.output()
-    st.download_button(
-        "⬇️ 下載 PDF",
-        data=bytes(pdf_bytes),
-        file_name="論文搜尋.pdf",
-        mime="application/pdf"
-    )
