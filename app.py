@@ -43,7 +43,6 @@ os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
 # 側欄統計（固定在左下角）
 with st.sidebar:
-    st.markdown("---")  # 分隔線把統計推到下方
     
     # 用 CSS 把統計區塊固定在左下角
     st.markdown("""
