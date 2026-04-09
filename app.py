@@ -41,18 +41,74 @@ textarea:focus {
 
 os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
-# 側欄統計
+# 側欄統計（固定在左下角）
 with st.sidebar:
-    st.markdown("## 使用統計")
+    st.markdown("---")  # 分隔線把統計推到下方
+    
+    # 用 CSS 把統計區塊固定在左下角
+    st.markdown("""
+    <style>
+    [data-testid="stSidebar"] > div:first-child {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .stats-container {
+        margin-top: auto;
+        padding: 16px;
+        background: #F0F4FF;
+        border-radius: 10px;
+        border: 1px solid #2563EB;
+    }
+    .stats-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: #1E3A5F;
+        margin-bottom: 8px;
+    }
+    .stats-number {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2563EB;
+    }
+    .stats-label {
+        font-size: 12px;
+        color: #6B7280;
+    }
+    .stats-divider {
+        border-top: 1px solid #D1D5DB;
+        margin: 8px 0;
+    }
+    .stats-row {
+        font-size: 12px;
+        color: #374151;
+        padding: 2px 0;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     stats = load_stats()
     today = datetime.now().strftime("%Y-%m-%d")
-    st.metric("總搜尋次數", stats["total"])
-    st.metric("今日搜尋", stats["daily"].get(today, 0))
-    st.markdown("#### 最近搜尋紀錄")
-    recent = sorted(stats["daily"].items(), reverse=True)[:7]
-    for date, count in recent:
-        st.text(f"{date}：{count} 次")
+    today_count = stats["daily"].get(today, 0)
+    recent = sorted(stats["daily"].items(), reverse=True)[:5]
+    recent_rows = "".join(
+        f'<div class="stats-row">{date}　{count} 次</div>'
+        for date, count in recent
+    )
 
+    st.markdown(f"""
+    <div class="stats-container">
+        <div class="stats-title">使用統計</div>
+        <div class="stats-number">{stats["total"]}</div>
+        <div class="stats-label">總搜尋次數</div>
+        <div class="stats-divider"></div>
+        <div class="stats-label">今日搜尋：<b>{today_count} 次</b></div>
+        <div class="stats-divider"></div>
+        <div class="stats-label" style="margin-bottom:4px">最近紀錄</div>
+        {recent_rows}
+    </div>
+    """, unsafe_allow_html=True)
+    
 st.title("論文搜尋 Agent ouo")
 st.markdown("### 搜尋條件")
 
