@@ -4,6 +4,26 @@ from agent import run_agent
 from datetime import datetime
 
 st.set_page_config(page_title="論文搜尋 Agent ouo")
+STATS_FILE = "stats.json"
+
+def load_stats():
+    if os.path.exists(STATS_FILE):
+        with open(STATS_FILE, "r") as f:
+            return json.load(f)
+    return {"total": 0, "daily": {}}
+
+def save_stats(stats):
+    with open(STATS_FILE, "w") as f:
+        json.dump(stats, f)
+
+def add_click():
+    stats = load_stats()
+    stats["total"] += 1
+    today = datetime.now().strftime("%Y-%m-%d")
+    stats["daily"][today] = stats["daily"].get(today, 0) + 1
+    save_stats(stats)
+    return stats
+    
 st.markdown("""
 <style>
 /* 對話輸入框加框線 */
