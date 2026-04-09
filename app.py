@@ -43,26 +43,24 @@ os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
 # 側欄統計（固定在左下角）
 with st.sidebar:
-    
-    # 用 CSS 把統計區塊固定在左下角
     st.markdown("""
     <style>
     [data-testid="stSidebar"] {
-    display: flex;
-    flex-direction: column;
-}
+        display: flex;
+        flex-direction: column;
+    }
     [data-testid="stSidebarContent"] {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
     .stats-container {
-    margin-top: auto;
-    padding: 16px;
-    background: #F0F4FF;
-    border-radius: 10px;
-    border: 1px solid #2563EB;
-}
+        margin-top: auto;
+        padding: 16px;
+        background: #F0F4FF;
+        border-radius: 10px;
+        border: 1px solid #2563EB;
+    }
     .stats-title {
         font-size: 14px;
         font-weight: bold;
@@ -99,38 +97,37 @@ with st.sidebar:
         for date, count in recent
     )
 
-st.markdown(f"""
+    # ← 這行必須在 with st.sidebar: 裡面
+    st.markdown(f"""
     <div class="stats-container">
         <div class="stats-title">使用統計</div>
         <div class="stats-label">總搜尋次數</div>
         <div class="stats-number">{stats["total"]}</div>
         <div class="stats-divider"></div>
         <div class="stats-label">今日搜尋：<b>{today_count} 次</b></div>
+        <div class="stats-divider"></div>
         <div class="stats-label" style="margin-bottom:4px">最近紀錄</div>
         {recent_rows}
     </div>
     """, unsafe_allow_html=True)
-    
+
 st.title("論文搜尋 Agent ouo")
 st.markdown("### 搜尋條件")
 
 col_a, col_b, col_c = st.columns(3)
 
 with col_a:
-    keyword1 = st.text_input("第一順位",
-                              placeholder="例如：人工智慧")
+    keyword1 = st.text_input("第一順位", placeholder="例如：人工智慧")
 with col_b:
-    keyword2 = st.text_input("第二順位",
-                              placeholder="例如：台獨")
+    keyword2 = st.text_input("第二順位", placeholder="例如：台獨")
 with col_c:
-    keyword3 = st.text_input("第三順位",
-                              placeholder="例如：社會階層")
+    keyword3 = st.text_input("第三順位", placeholder="例如：社會階層")
 
 if st.button("搜尋", type="primary"):
     if not keyword1.strip():
         st.warning("請至少填寫第一順位關鍵字")
     else:
-        add_click()  # 記錄點擊
+        add_click()
 
         keywords = [k for k in [keyword1, keyword2, keyword3] if k.strip()]
         combined_query = " ".join(keywords)
