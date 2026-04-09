@@ -66,7 +66,7 @@ with st.sidebar:
         height: 100vh;
     }
     .stats-container {
-        margin-top: auto;
+        margin-top: 40px;
         padding: 16px;
         background: #F0F4FF;
         border-radius: 10px;
@@ -98,6 +98,7 @@ with st.sidebar:
     }
     </style>
     """, unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 32px'></div>", unsafe_allow_html=True)
 
     # ── 使用統計 ────────────────────────────────
     stats = load_stats()
@@ -121,6 +122,7 @@ with st.sidebar:
         {recent_rows}
     </div>
     """, unsafe_allow_html=True)
+    
     # ── 收藏夾 ──────────────────────────────────
     st.markdown("## 收藏夾")
     favorites = load_favorites()
