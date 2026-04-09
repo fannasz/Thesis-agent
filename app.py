@@ -222,17 +222,22 @@ if st.button("搜尋", type="primary"):
 
         def update(msg):
             status.info(msg)
-
-        with st.spinner(""):
+with st.spinner(""):
             try:
                 result = run_agent(query, progress_callback=update)
+                st.session_state["result"] = result
+                st.session_state["combined_query"] = combined_query
             except Exception as e:
                 result = f"⚠️ 發生錯誤：{str(e)}"
+                st.session_state["result"] = result
 
         status.empty()
 
-        if result:
-            papers, analysis = parse_result(result)
+# 從 session_state 讀取結果（移到 if st.button 區塊外面）
+if "result" in st.session_state:
+    result = st.session_state["result"]
+    combined_query = st.session_state.get("combined_query", "")
+    papers, analysis = parse_result(result)
 
             if papers:
                 st.markdown("### 搜尋結果")
