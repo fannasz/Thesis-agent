@@ -95,7 +95,7 @@ with st.sidebar:
         for date, count in recent
     )
 
-   st.markdown(f"""
+st.markdown(f"""
     <div class="stats-container">
         <div class="stats-title">使用統計</div>
         <div class="stats-label">總搜尋次數</div>
