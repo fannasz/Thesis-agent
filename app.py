@@ -31,7 +31,7 @@ with col_a:
                               placeholder="例如：人工智慧")
 with col_b:
     keyword2 = st.text_input("第二順位",
-                              placeholder="例如：台灣")
+                              placeholder="例如：台獨")
 with col_c:
     keyword3 = st.text_input("第三順位",
                               placeholder="例如：社會階層")
