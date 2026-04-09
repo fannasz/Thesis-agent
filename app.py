@@ -204,6 +204,7 @@ if st.button("搜尋", type="primary"):
         st.warning("請至少填寫第一順位關鍵字")
     else:
         add_click()
+        st.session_state.pop("result", None)
 
         keywords = [k for k in [keyword1, keyword2, keyword3] if k.strip()]
         combined_query = " ".join(keywords)
@@ -232,6 +233,7 @@ if st.button("搜尋", type="primary"):
                 st.session_state["result"] = f"⚠️ 發生錯誤：{str(e)}"
 
         status.empty()
+        st.rerun()
 
 # ── 結果顯示（在 session_state，checkbox 不會跳回搜尋列）──
 if "result" in st.session_state:
