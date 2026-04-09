@@ -102,7 +102,6 @@ with st.sidebar:
         <div class="stats-number">{stats["total"]}</div>
         <div class="stats-divider"></div>
         <div class="stats-label">今日搜尋：<b>{today_count} 次</b></div>
-        <div class="stats-divider"></div>
         <div class="stats-label" style="margin-bottom:4px">最近紀錄</div>
         {recent_rows}
     </div>
