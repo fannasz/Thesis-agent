@@ -47,18 +47,22 @@ with st.sidebar:
     # 用 CSS 把統計區塊固定在左下角
     st.markdown("""
     <style>
-    [data-testid="stSidebar"] > div:first-child {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
+    [data-testid="stSidebar"] {
+    display: flex;
+    flex-direction: column;
+}
+    [data-testid="stSidebarContent"] {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
     .stats-container {
-        margin-top: auto;
-        padding: 16px;
-        background: #F0F4FF;
-        border-radius: 10px;
-        border: 1px solid #2563EB;
-    }
+    margin-top: auto;
+    padding: 16px;
+    background: #F0F4FF;
+    border-radius: 10px;
+    border: 1px solid #2563EB;
+}
     .stats-title {
         font-size: 14px;
         font-weight: bold;
