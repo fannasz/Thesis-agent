@@ -99,31 +99,6 @@ with st.sidebar:
     </style>
     """, unsafe_allow_html=True)
 
-
-    # ── 使用統計 ────────────────────────────────
-    stats = load_stats()
-    today = datetime.now().strftime("%Y-%m-%d")
-    today_count = stats["daily"].get(today, 0)
-    recent = sorted(stats["daily"].items(), reverse=True)[:5]
-    recent_rows = "".join(
-        f'<div class="stats-row">{date}　{count} 次</div>'
-        for date, count in recent
-    )
-
-    st.markdown(f"""
-    <div class="stats-container">
-        <div class="stats-title">使用統計</div>
-        <div class="stats-label">總搜尋次數</div>
-        <div class="stats-number">{stats["total"]}</div>
-        <div class="stats-divider"></div>
-        <div class="stats-label">今日搜尋：<b>{today_count} 次</b></div>
-        <div class="stats-divider"></div>
-        <div class="stats-label" style="margin-bottom:4px">最近紀錄</div>
-        {recent_rows}
-    </div>
-    """, unsafe_allow_html=True)
-     st.markdown("---")
-    
     # ── 收藏夾 ──────────────────────────────────
     st.markdown("## 收藏夾")
     favorites = load_favorites()
@@ -137,7 +112,6 @@ with st.sidebar:
                 st.caption(f"儲存時間：{fav['time']}")
                 st.markdown(fav["result"])
 
-                # 下載單筆收藏
                 col_d1, col_d2 = st.columns(2)
                 with col_d1:
                     st.download_button(
@@ -165,11 +139,36 @@ with st.sidebar:
                         key=f"dl_word_{i}"
                     )
 
-                # 刪除單筆收藏
                 if st.button("刪除", key=f"del_{i}"):
                     favorites.pop(i)
                     save_favorites(favorites)
                     st.rerun()
+
+    # 收藏夾與統計之間的距離
+    st.markdown("<div style='margin-top: 32px'></div>", unsafe_allow_html=True)
+
+    # ── 使用統計 ────────────────────────────────
+    stats = load_stats()
+    today = datetime.now().strftime("%Y-%m-%d")
+    today_count = stats["daily"].get(today, 0)
+    recent = sorted(stats["daily"].items(), reverse=True)[:5]
+    recent_rows = "".join(
+        f'<div class="stats-row">{date}　{count} 次</div>'
+        for date, count in recent
+    )
+
+    st.markdown(f"""
+    <div class="stats-container">
+        <div class="stats-title">使用統計</div>
+        <div class="stats-label">總搜尋次數</div>
+        <div class="stats-number">{stats["total"]}</div>
+        <div class="stats-divider"></div>
+        <div class="stats-label">今日搜尋：<b>{today_count} 次</b></div>
+        <div class="stats-divider"></div>
+        <div class="stats-label" style="margin-bottom:4px">最近紀錄</div>
+        {recent_rows}
+    </div>
+    """, unsafe_allow_html=True)
 
 # ── 主頁面 ─────────────────────────────────────────
 st.title("論文搜尋 Agent ouo")
@@ -219,7 +218,6 @@ if st.button("搜尋", type="primary"):
         if result:
             st.markdown(result)
 
-            # 儲存到收藏夾
             st.markdown("---")
             save_title = st.text_input(
                 "儲存這筆結果",
@@ -240,7 +238,6 @@ if st.button("搜尋", type="primary"):
                 else:
                     st.warning("請輸入名稱")
 
-            # 下載
             col1, col2 = st.columns(2)
             with col1:
                 st.download_button(
