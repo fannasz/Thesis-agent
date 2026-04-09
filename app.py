@@ -115,51 +115,51 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     # ── 收藏夾 ──────────────────────────────────
-    st.markdown("## 收藏夾", expanded=True):
-    favorites = load_favorites()
+    with st.expander("收藏夾", expanded=True):
+        favorites = load_favorites()
 
-    if not favorites:
-        st.caption("還沒有收藏的搜尋結果")
-    else:
-        for i, fav in enumerate(favorites):
-            with st.expander(f"📄 {fav['title']}"):
-                st.caption(f"關鍵字：{fav['keywords']}")
-                st.caption(f"儲存時間：{fav['time']}")
-                if fav.get("paper_count"):
-                    st.caption(f"論文數：{fav['paper_count']} 篇")
-                st.markdown(fav["result"])
+        if not favorites:
+            st.caption("還沒有收藏的搜尋結果")
+        else:
+            for i, fav in enumerate(favorites):
+                with st.expander(f"📄 {fav['title']}"):
+                    st.caption(f"關鍵字：{fav['keywords']}")
+                    st.caption(f"儲存時間：{fav['time']}")
+                    if fav.get("paper_count"):
+                        st.caption(f"論文數：{fav['paper_count']} 篇")
+                    st.markdown(fav["result"])
 
-                col_d1, col_d2 = st.columns(2)
-                with col_d1:
-                    st.download_button(
-                        "下載 Markdown",
-                        data=fav["result"],
-                        file_name=f"{fav['title']}.md",
-                        mime="text/markdown",
-                        key=f"dl_md_{i}"
-                    )
-                with col_d2:
-                    from docx import Document
-                    from io import BytesIO
-                    doc = Document()
-                    doc.add_heading(fav["title"], 0)
-                    for line in fav["result"].split("\n"):
-                        doc.add_paragraph(line)
-                    buf = BytesIO()
-                    doc.save(buf)
-                    buf.seek(0)
-                    st.download_button(
-                        "下載 Word",
-                        data=buf,
-                        file_name=f"{fav['title']}.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        key=f"dl_word_{i}"
-                    )
+                    col_d1, col_d2 = st.columns(2)
+                    with col_d1:
+                        st.download_button(
+                            "下載 Markdown",
+                            data=fav["result"],
+                            file_name=f"{fav['title']}.md",
+                            mime="text/markdown",
+                            key=f"dl_md_{i}"
+                        )
+                    with col_d2:
+                        from docx import Document
+                        from io import BytesIO
+                        doc = Document()
+                        doc.add_heading(fav["title"], 0)
+                        for line in fav["result"].split("\n"):
+                            doc.add_paragraph(line)
+                        buf = BytesIO()
+                        doc.save(buf)
+                        buf.seek(0)
+                        st.download_button(
+                            "下載 Word",
+                            data=buf,
+                            file_name=f"{fav['title']}.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                            key=f"dl_word_{i}"
+                        )
 
-                if st.button("刪除", key=f"del_{i}"):
-                    favorites.pop(i)
-                    save_favorites(favorites)
-                    st.rerun()
+                    if st.button("刪除", key=f"del_{i}"):
+                        favorites.pop(i)
+                        save_favorites(favorites)
+                        st.rerun()
 
     st.markdown("<div style='margin-top: 32px'></div>", unsafe_allow_html=True)
 
@@ -204,7 +204,7 @@ if st.button("搜尋", type="primary"):
         st.warning("請至少填寫第一順位關鍵字")
     else:
         add_click()
-        st.session_state.pop("result", None)  # 清除舊結果
+        st.session_state.pop("result", None)
 
         keywords = [k for k in [keyword1, keyword2, keyword3] if k.strip()]
         combined_query = " ".join(keywords)
@@ -233,7 +233,7 @@ if st.button("搜尋", type="primary"):
                 st.session_state["result"] = f"⚠️ 發生錯誤：{str(e)}"
 
         status.empty()
-        st.rerun()  # 強制重新執行顯示結果
+        st.rerun()
 
 # ── 結果顯示 ──────────────────────────────────────
 if "result" in st.session_state:
