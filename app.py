@@ -115,7 +115,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     # ── 收藏夾 ──────────────────────────────────
-    st.markdown("## 收藏夾")
+    st.markdown("## 收藏夾", expanded=True):
     favorites = load_favorites()
 
     if not favorites:
