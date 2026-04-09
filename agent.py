@@ -34,20 +34,34 @@ SYSTEM_PROMPT = """
 4. 排除明顯不相關的論文
 
 ## 每篇論文輸出格式
-**【序號】標題**
-- 作者：XXX | 年份：XXXX | 引用次數：XX
-- 來源：期刊或會議名稱
-- 核心論點：1-2 句話說明這篇研究在做什麼
-- 相關性：說明與使用者研究問題的具體關聯
-- DOI：連結（如有）
+輸出必須放在 <papers> 標籤內，使用以下 JSON 格式：
+<papers>
+[
+  {
+    "id": 序號,
+    "title": "標題",
+    "authors": "XXX",
+    "year": 年份,
+    "citations": 引用次數,
+    "journal": "期刊或會議名稱",
+    "summary": "1-2 句話說明這篇研究在做什麼",
+    "relevance": "說明與使用者研究問題的具體關聯",
+    "doi": "連結或空字串"
+  }
+]
+</papers>
 
 ## 最後加上文獻整體分析
+輸出必須放在 <analysis> 標籤內：
+<analysis>
 - 尚未被充分研究的缺口
 - 建議延伸閱讀的方向
+</analysis>
 
 ## 規則
 - 所有論文必須來自 search_thesis 工具的實際結果
 - 禁止捏造論文
+- JSON 格式必須正確，不可有多餘逗號或缺少引號
 """
 
 def run_agent(user_query: str, progress_callback=None) -> str:
