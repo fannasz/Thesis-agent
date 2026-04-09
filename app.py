@@ -99,6 +99,28 @@ with st.sidebar:
     </style>
     """, unsafe_allow_html=True)
 
+    # ── 使用統計 ────────────────────────────────
+    stats = load_stats()
+    today = datetime.now().strftime("%Y-%m-%d")
+    today_count = stats["daily"].get(today, 0)
+    recent = sorted(stats["daily"].items(), reverse=True)[:5]
+    recent_rows = "".join(
+        f'<div class="stats-row">{date}　{count} 次</div>'
+        for date, count in recent
+    )
+
+    st.markdown(f"""
+    <div class="stats-container">
+        <div class="stats-title">使用統計</div>
+        <div class="stats-label">總搜尋次數</div>
+        <div class="stats-number">{stats["total"]}</div>
+        <div class="stats-divider"></div>
+        <div class="stats-label">今日搜尋：<b>{today_count} 次</b></div>
+        <div class="stats-divider"></div>
+        <div class="stats-label" style="margin-bottom:4px">最近紀錄</div>
+        {recent_rows}
+    </div>
+    """, unsafe_allow_html=True)
     # ── 收藏夾 ──────────────────────────────────
     st.markdown("## 收藏夾")
     favorites = load_favorites()
@@ -147,29 +169,6 @@ with st.sidebar:
                     st.rerun()
 
     st.markdown("---")
-
-    # ── 使用統計 ────────────────────────────────
-    stats = load_stats()
-    today = datetime.now().strftime("%Y-%m-%d")
-    today_count = stats["daily"].get(today, 0)
-    recent = sorted(stats["daily"].items(), reverse=True)[:5]
-    recent_rows = "".join(
-        f'<div class="stats-row">{date}　{count} 次</div>'
-        for date, count in recent
-    )
-
-    st.markdown(f"""
-    <div class="stats-container">
-        <div class="stats-title">使用統計</div>
-        <div class="stats-label">總搜尋次數</div>
-        <div class="stats-number">{stats["total"]}</div>
-        <div class="stats-divider"></div>
-        <div class="stats-label">今日搜尋：<b>{today_count} 次</b></div>
-        <div class="stats-divider"></div>
-        <div class="stats-label" style="margin-bottom:4px">最近紀錄</div>
-        {recent_rows}
-    </div>
-    """, unsafe_allow_html=True)
 
 # ── 主頁面 ─────────────────────────────────────────
 st.title("論文搜尋 Agent ouo")
