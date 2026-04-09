@@ -7,6 +7,7 @@ from datetime import datetime
 st.set_page_config(page_title="論文搜尋 Agent ouo")
 
 STATS_FILE = "stats.json"
+FAVORITES_FILE = "favorites.json"
 
 def load_stats():
     if os.path.exists(STATS_FILE):
@@ -26,6 +27,16 @@ def add_click():
     save_stats(stats)
     return stats
 
+def load_favorites():
+    if os.path.exists(FAVORITES_FILE):
+        with open(FAVORITES_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+def save_favorites(favorites):
+    with open(FAVORITES_FILE, "w", encoding="utf-8") as f:
+        json.dump(favorites, f, ensure_ascii=False, indent=2)
+
 st.markdown("""
 <style>
 textarea {
@@ -41,7 +52,7 @@ textarea:focus {
 
 os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
-# 側欄統計（固定在左下角）
+# ── 側欄 ──────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
     <style>
@@ -88,6 +99,56 @@ with st.sidebar:
     </style>
     """, unsafe_allow_html=True)
 
+    # ── 收藏夾 ──────────────────────────────────
+    st.markdown("## 收藏夾")
+    favorites = load_favorites()
+
+    if not favorites:
+        st.caption("還沒有收藏的搜尋結果")
+    else:
+        for i, fav in enumerate(favorites):
+            with st.expander(f"📄 {fav['title']}"):
+                st.caption(f"關鍵字：{fav['keywords']}")
+                st.caption(f"儲存時間：{fav['time']}")
+                st.markdown(fav["result"])
+
+                # 下載單筆收藏
+                col_d1, col_d2 = st.columns(2)
+                with col_d1:
+                    st.download_button(
+                        "下載 Markdown",
+                        data=fav["result"],
+                        file_name=f"{fav['title']}.md",
+                        mime="text/markdown",
+                        key=f"dl_md_{i}"
+                    )
+                with col_d2:
+                    from docx import Document
+                    from io import BytesIO
+                    doc = Document()
+                    doc.add_heading(fav["title"], 0)
+                    for line in fav["result"].split("\n"):
+                        doc.add_paragraph(line)
+                    buf = BytesIO()
+                    doc.save(buf)
+                    buf.seek(0)
+                    st.download_button(
+                        "下載 Word",
+                        data=buf,
+                        file_name=f"{fav['title']}.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        key=f"dl_word_{i}"
+                    )
+
+                # 刪除單筆收藏
+                if st.button("刪除", key=f"del_{i}"):
+                    favorites.pop(i)
+                    save_favorites(favorites)
+                    st.rerun()
+
+    st.markdown("---")
+
+    # ── 使用統計 ────────────────────────────────
     stats = load_stats()
     today = datetime.now().strftime("%Y-%m-%d")
     today_count = stats["daily"].get(today, 0)
@@ -97,7 +158,6 @@ with st.sidebar:
         for date, count in recent
     )
 
-    # ← 這行必須在 with st.sidebar: 裡面
     st.markdown(f"""
     <div class="stats-container">
         <div class="stats-title">使用統計</div>
@@ -111,6 +171,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
+# ── 主頁面 ─────────────────────────────────────────
 st.title("論文搜尋 Agent ouo")
 st.markdown("### 搜尋條件")
 
@@ -158,8 +219,29 @@ if st.button("搜尋", type="primary"):
         if result:
             st.markdown(result)
 
-            col1, col2 = st.columns(2)
+            # 儲存到收藏夾
+            st.markdown("---")
+            save_title = st.text_input(
+                "儲存這筆結果",
+                placeholder="幫這次搜尋取個名稱，例如：AI態度相關論文",
+                key="save_title"
+            )
+            if st.button("加入收藏夾"):
+                if save_title.strip():
+                    favorites = load_favorites()
+                    favorites.append({
+                        "title": save_title.strip(),
+                        "keywords": combined_query,
+                        "result": result,
+                        "time": datetime.now().strftime("%Y-%m-%d %H:%M")
+                    })
+                    save_favorites(favorites)
+                    st.success("已儲存到收藏夾！")
+                else:
+                    st.warning("請輸入名稱")
 
+            # 下載
+            col1, col2 = st.columns(2)
             with col1:
                 st.download_button(
                     "下載 Markdown",
@@ -167,11 +249,9 @@ if st.button("搜尋", type="primary"):
                     file_name="論文搜尋.md",
                     mime="text/markdown"
                 )
-
             with col2:
                 from docx import Document
                 from io import BytesIO
-
                 doc = Document()
                 doc.add_heading("論文搜尋結果", 0)
                 for line in result.split("\n"):
