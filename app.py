@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import json
+import re
 from agent import run_agent
 from datetime import datetime
 
@@ -36,6 +37,20 @@ def load_favorites():
 def save_favorites(favorites):
     with open(FAVORITES_FILE, "w", encoding="utf-8") as f:
         json.dump(favorites, f, ensure_ascii=False, indent=2)
+
+def parse_result(result: str):
+    papers = []
+    analysis = ""
+    papers_match = re.search(r'<papers>(.*?)</papers>', result, re.DOTALL)
+    if papers_match:
+        try:
+            papers = json.loads(papers_match.group(1).strip())
+        except:
+            papers = []
+    analysis_match = re.search(r'<analysis>(.*?)</analysis>', result, re.DOTALL)
+    if analysis_match:
+        analysis = analysis_match.group(1).strip()
+    return papers, analysis
 
 st.markdown("""
 <style>
@@ -110,6 +125,8 @@ with st.sidebar:
             with st.expander(f"📄 {fav['title']}"):
                 st.caption(f"關鍵字：{fav['keywords']}")
                 st.caption(f"儲存時間：{fav['time']}")
+                if fav.get("paper_count"):
+                    st.caption(f"論文數：{fav['paper_count']} 篇")
                 st.markdown(fav["result"])
 
                 col_d1, col_d2 = st.columns(2)
@@ -144,7 +161,6 @@ with st.sidebar:
                     save_favorites(favorites)
                     st.rerun()
 
-    # 收藏夾與統計之間的距離
     st.markdown("<div style='margin-top: 32px'></div>", unsafe_allow_html=True)
 
     # ── 使用統計 ────────────────────────────────
@@ -216,49 +232,130 @@ if st.button("搜尋", type="primary"):
         status.empty()
 
         if result:
-            st.markdown(result)
+            papers, analysis = parse_result(result)
 
-            st.markdown("---")
-            save_title = st.text_input(
-                "儲存這筆結果",
-                placeholder="幫這次搜尋取個名稱，例如：AI態度相關論文",
-                key="save_title"
-            )
-            if st.button("加入收藏夾"):
-                if save_title.strip():
-                    favorites = load_favorites()
-                    favorites.append({
-                        "title": save_title.strip(),
-                        "keywords": combined_query,
-                        "result": result,
-                        "time": datetime.now().strftime("%Y-%m-%d %H:%M")
-                    })
-                    save_favorites(favorites)
-                    st.success("已儲存到收藏夾！")
-                else:
-                    st.warning("請輸入名稱")
+            if papers:
+                st.markdown("### 搜尋結果")
+                st.caption("勾選想收藏的論文，再點「加入收藏夾」")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                st.download_button(
-                    "下載 Markdown",
-                    data=result,
-                    file_name="論文搜尋.md",
-                    mime="text/markdown"
+                # 全選
+                select_all = st.checkbox("全選")
+
+                # 每篇論文
+                selected_papers = []
+                for paper in papers:
+                    checked = st.checkbox(
+                        f"**【{paper['id']}】{paper['title']}**",
+                        value=select_all,
+                        key=f"paper_{paper['id']}"
+                    )
+                    if checked:
+                        selected_papers.append(paper)
+
+                    with st.expander("查看詳細資訊"):
+                        st.markdown(f"- **作者：** {paper['authors']}　|　**年份：** {paper['year']}　|　**引用次數：** {paper['citations']}")
+                        st.markdown(f"- **來源：** {paper.get('journal', '無')}")
+                        if paper.get('keywords'):
+                            st.markdown(f"- **關鍵字：** {', '.join(paper['keywords'])}")
+                        st.markdown(f"- **核心論點：** {paper['summary']}")
+                        st.markdown(f"- **相關性：** {paper['relevance']}")
+                        if paper.get('doi'):
+                            st.markdown(f"- **DOI：** {paper['doi']}")
+
+                st.markdown("---")
+
+                if analysis:
+                    st.markdown(analysis)
+
+                st.markdown("---")
+
+                # 儲存勾選論文
+                save_title = st.text_input(
+                    "收藏名稱",
+                    placeholder="幫這次搜尋取個名稱，例如：AI態度相關論文",
+                    key="save_title"
                 )
-            with col2:
-                from docx import Document
-                from io import BytesIO
-                doc = Document()
-                doc.add_heading("論文搜尋結果", 0)
-                for line in result.split("\n"):
-                    doc.add_paragraph(line)
-                buf = BytesIO()
-                doc.save(buf)
-                buf.seek(0)
-                st.download_button(
-                    "下載 Word",
-                    data=buf,
-                    file_name="論文搜尋.docx",
-                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+                if st.button("加入收藏夾", type="primary"):
+                    if not save_title.strip():
+                        st.warning("請輸入收藏名稱")
+                    elif not selected_papers:
+                        st.warning("請至少勾選一篇論文")
+                    else:
+                        saved_text = f"# {save_title}\n\n"
+                        for p in selected_papers:
+                            saved_text += f"## 【{p['id']}】{p['title']}\n"
+                            saved_text += f"- 作者：{p['authors']} | 年份：{p['year']} | 引用：{p['citations']}\n"
+                            saved_text += f"- 來源：{p.get('journal', '無')}\n"
+                            if p.get('keywords'):
+                                saved_text += f"- 關鍵字：{', '.join(p['keywords'])}\n"
+                            saved_text += f"- 核心論點：{p['summary']}\n"
+                            saved_text += f"- 相關性：{p['relevance']}\n"
+                            if p.get('doi'):
+                                saved_text += f"- DOI：{p['doi']}\n"
+                            saved_text += "\n"
+
+                        favorites = load_favorites()
+                        favorites.append({
+                            "title": save_title.strip(),
+                            "keywords": combined_query,
+                            "result": saved_text,
+                            "paper_count": len(selected_papers),
+                            "time": datetime.now().strftime("%Y-%m-%d %H:%M")
+                        })
+                        save_favorites(favorites)
+                        st.success(f"已儲存 {len(selected_papers)} 篇論文到收藏夾！")
+
+                # 下載完整結果
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.download_button(
+                        "下載 Markdown",
+                        data=result,
+                        file_name="論文搜尋.md",
+                        mime="text/markdown"
+                    )
+                with col2:
+                    from docx import Document
+                    from io import BytesIO
+                    doc = Document()
+                    doc.add_heading("論文搜尋結果", 0)
+                    for paper in papers:
+                        doc.add_heading(f"【{paper['id']}】{paper['title']}", level=2)
+                        doc.add_paragraph(f"作者：{paper['authors']} | 年份：{paper['year']}")
+                        doc.add_paragraph(f"核心論點：{paper['summary']}")
+                        if paper.get('doi'):
+                            doc.add_paragraph(f"DOI：{paper['doi']}")
+                    buf = BytesIO()
+                    doc.save(buf)
+                    buf.seek(0)
+                    st.download_button(
+                        "下載 Word",
+                        data=buf,
+                        file_name="論文搜尋.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    )
+
+            else:
+                # 解析失敗時顯示原始結果
+                st.markdown(result)
+
+                st.markdown("---")
+                save_title = st.text_input(
+                    "收藏名稱",
+                    placeholder="幫這次搜尋取個名稱",
+                    key="save_title_raw"
                 )
+                if st.button("加入收藏夾"):
+                    if save_title.strip():
+                        favorites = load_favorites()
+                        favorites.append({
+                            "title": save_title.strip(),
+                            "keywords": combined_query,
+                            "result": result,
+                            "time": datetime.now().strftime("%Y-%m-%d %H:%M")
+                        })
+                        save_favorites(favorites)
+                        st.success("已儲存到收藏夾！")
+                    else:
+                        st.warning("請輸入名稱")
