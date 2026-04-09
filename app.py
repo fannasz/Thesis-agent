@@ -307,6 +307,7 @@ if "result" in st.session_state:
                 })
                 save_favorites(favorites)
                 st.success(f"已儲存 {len(selected_papers)} 篇論文到收藏夾！")
+                st.rerun()
 
         col1, col2 = st.columns(2)
         with col1:
@@ -357,5 +358,6 @@ if "result" in st.session_state:
                 })
                 save_favorites(favorites)
                 st.success("已儲存到收藏夾！")
+                st.rerun()
             else:
                 st.warning("請輸入名稱")
