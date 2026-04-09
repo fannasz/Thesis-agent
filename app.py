@@ -98,7 +98,7 @@ with st.sidebar:
     }
     </style>
     """, unsafe_allow_html=True)
-    st.markdown("<div style='margin-top: 32px'></div>", unsafe_allow_html=True)
+
 
     # ── 使用統計 ────────────────────────────────
     stats = load_stats()
@@ -122,6 +122,7 @@ with st.sidebar:
         {recent_rows}
     </div>
     """, unsafe_allow_html=True)
+     st.markdown("---")
     
     # ── 收藏夾 ──────────────────────────────────
     st.markdown("## 收藏夾")
@@ -169,8 +170,6 @@ with st.sidebar:
                     favorites.pop(i)
                     save_favorites(favorites)
                     st.rerun()
-
-    st.markdown("---")
 
 # ── 主頁面 ─────────────────────────────────────────
 st.title("論文搜尋 Agent ouo")
