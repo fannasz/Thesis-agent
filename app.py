@@ -29,14 +29,12 @@ def add_click():
     return stats
 
 def load_favorites():
-    if os.path.exists(FAVORITES_FILE):
-        with open(FAVORITES_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
+    if "favorites" not in st.session_state:
+        st.session_state["favorites"] = []
+    return st.session_state["favorites"]
 
 def save_favorites(favorites):
-    with open(FAVORITES_FILE, "w", encoding="utf-8") as f:
-        json.dump(favorites, f, ensure_ascii=False, indent=2)
+    st.session_state["favorites"] = favorites
 
 def parse_result(result: str):
     papers = []
