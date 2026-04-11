@@ -2,28 +2,45 @@ import streamlit as st
 import os
 import json
 import re
+import requests
 from agent import run_agent
 from datetime import datetime
 
 st.set_page_config(page_title="論文搜尋 Agent ouo")
 
-STATS_FILE = "stats.json"
-FAVORITES_FILE = "favorites.json"
+JSONBIN_URL = "https://api.jsonbin.io/v3/b"
 
 def load_stats():
-    if os.path.exists(STATS_FILE):
-        with open(STATS_FILE, "r") as f:
-            return json.load(f)
-    return {"total": 0, "daily": {}}
+    try:
+        res = requests.get(
+            f"{JSONBIN_URL}/{st.secrets['JSONBIN_BIN_ID']}/latest",
+            headers={"X-Master-Key": st.secrets["JSONBIN_API_KEY"]},
+            timeout=5
+        )
+        return res.json().get("record", {"total": 0, "daily": {}})
+    except:
+        return {"total": 0, "daily": {}}
 
 def save_stats(stats):
-    with open(STATS_FILE, "w") as f:
-        json.dump(stats, f)
+    try:
+        requests.put(
+            f"{JSONBIN_URL}/{st.secrets['JSONBIN_BIN_ID']}",
+            headers={
+                "X-Master-Key": st.secrets["JSONBIN_API_KEY"],
+                "Content-Type": "application/json"
+            },
+            json=stats,
+            timeout=5
+        )
+    except:
+        pass
 
 def add_click():
     stats = load_stats()
-    stats["total"] += 1
+    stats["total"] = stats.get("total", 0) + 1
     today = datetime.now().strftime("%Y-%m-%d")
+    if "daily" not in stats:
+        stats["daily"] = {}
     stats["daily"][today] = stats["daily"].get(today, 0) + 1
     save_stats(stats)
     return stats
@@ -164,8 +181,8 @@ with st.sidebar:
     # ── 使用統計 ────────────────────────────────
     stats = load_stats()
     today = datetime.now().strftime("%Y-%m-%d")
-    today_count = stats["daily"].get(today, 0)
-    recent = sorted(stats["daily"].items(), reverse=True)[:5]
+    today_count = stats.get("daily", {}).get(today, 0)
+    recent = sorted(stats.get("daily", {}).items(), reverse=True)[:5]
     recent_rows = "".join(
         f'<div class="stats-row">{date}　{count} 次</div>'
         for date, count in recent
@@ -175,7 +192,7 @@ with st.sidebar:
     <div class="stats-container">
         <div class="stats-title">使用統計</div>
         <div class="stats-label">總搜尋次數</div>
-        <div class="stats-number">{stats["total"]}</div>
+        <div class="stats-number">{stats.get("total", 0)}</div>
         <div class="stats-divider"></div>
         <div class="stats-label">今日搜尋：<b>{today_count} 次</b></div>
         <div class="stats-divider"></div>
