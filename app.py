@@ -230,7 +230,7 @@ if st.button("搜尋", type="primary"):
         keywords = [k for k in [keyword1, keyword2, keyword3] if k.strip()]
         combined_query = " ".join(keywords)
 
-         query = f"""
+        query = f"""
 請搜尋以下主題的論文：
 - 第一順位（必須符合）：{keyword1}
 {"- 第二順位（優先符合）：" + keyword2 if keyword2 else ""}
