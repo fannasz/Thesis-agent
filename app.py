@@ -230,14 +230,18 @@ if st.button("搜尋", type="primary"):
         keywords = [k for k in [keyword1, keyword2, keyword3] if k.strip()]
         combined_query = " ".join(keywords)
 
-        query = f"""
+         query = f"""
 請搜尋以下主題的論文：
 - 第一順位（必須符合）：{keyword1}
 {"- 第二順位（優先符合）：" + keyword2 if keyword2 else ""}
 {"- 第三順位（額外篩選）：" + keyword3 if keyword3 else ""}
+{"- 研究描述（用來理解研究背景與方向）：" + description if description.strip() else ""}
+
 搜尋時以第一順位為主要關鍵字，
 回傳的論文必須與第一順位相關，
 有符合第二、第三順位的論文優先排在前面。
+研究描述是用來幫助你理解使用者的研究背景，
+請根據描述的研究方向來判斷論文的相關性。
 """
 
         status = st.empty()
