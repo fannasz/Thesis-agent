@@ -213,6 +213,12 @@ with col_b:
     keyword2 = st.text_input("第二順位", placeholder="例如：台獨")
 with col_c:
     keyword3 = st.text_input("第三順位", placeholder="例如：社會階層")
+    
+description = st.text_area(
+    "研究描述（選填）",
+    placeholder="例如：我想了解台灣不同社會階層的民眾對人工智慧的接受程度與風險認知是否有差異",
+    height=80
+)
 
 if st.button("搜尋", type="primary"):
     if not keyword1.strip():
